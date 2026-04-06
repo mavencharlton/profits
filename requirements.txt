@@ -1,0 +1,7 @@
+flask
+websockets
+firebase-admin
+pandas
+pandas-ta
+numpy
+python-dotenv
