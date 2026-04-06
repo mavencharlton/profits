@@ -2,7 +2,7 @@ import asyncio
 import json
 import websockets
 
-DERIV_WS_URL = "wss://ws.binaryws.com/websockets/v3?app_id={app_id}"
+DERIV_WS_URL = "wss://ws.derivws.com/websockets/v3?app_id={app_id}"
 
 _GRANULARITY = {
     "M1": 60,    "M5": 300,  "M15": 900,
