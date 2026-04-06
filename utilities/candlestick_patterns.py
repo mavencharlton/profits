@@ -15,7 +15,7 @@ Each function signature:
 import numpy as np
 import pandas as pd
 
-from candlestick_utils import (
+from .candlestick_utils import (
     normalise,
     body, total_range, upper_wick, lower_wick,
     body_ratio, is_bullish, is_bearish,
