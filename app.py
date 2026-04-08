@@ -27,7 +27,7 @@ config = SessionConfig(
 
 async def main():
     # ── infra ─────────────────────────────────────────────────
-    deriv = DerivClient(app_id="your_app_id")
+    deriv = DerivClient()
     firebase = FirebaseClient(credential_path="firebase_creds.json")
     await deriv.connect()
 
