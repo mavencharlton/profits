@@ -19,8 +19,10 @@ class DerivClient:
         self.url = DERIV_WS_URL.format(app_id=app_id)
         self._ws = None
 
-    async def connect(self):
+    async def connect(self, api_token: str = None):
         self._ws = await websockets.connect(self.url)
+        if api_token:
+            await self._send({"authorize": api_token})  # ← Fix: authorize first
 
     async def disconnect(self):
         if self._ws:
@@ -31,8 +33,7 @@ class DerivClient:
         response = await self._ws.recv()
         data = json.loads(response)
         if data.get("error"):
-            raise DerivError(data["error"].get(
-                "message", "Unknown Deriv error"))
+            raise DerivError(data["error"].get("message", "Unknown Deriv error"))
         return data
 
     async def get_candles(self, symbol: str, timeframe: str, count: int) -> list[dict]:
