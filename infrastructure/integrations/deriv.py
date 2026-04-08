@@ -2,8 +2,9 @@ import json
 import threading
 import asyncio
 import websocket
+import os
 
-DERIV_WS_URL = "wss://ws.derivws.com/websockets/v3?app_id=1089"
+DERIV_WS_URL = "wss://ws.derivws.com/websockets/v3?app_id={app_id}"
 
 _GRANULARITY = {
     "M1": 60,    "M5": 300,  "M15": 900,
@@ -16,11 +17,11 @@ class DerivError(Exception):
 
 
 class DerivClient:
-    def __init__(self, app_id: str = "1089"):
+    def __init__(self):
+        app_id = os.getenv("DERIV_APP_ID", "1089")
         self.url = f"wss://ws.derivws.com/websockets/v3?app_id={app_id}"
 
     def _fetch_sync(self, payload: dict) -> dict:
-        """Blocking fetch — runs in a thread."""
         result = {}
         done = threading.Event()
 
@@ -46,6 +47,7 @@ class DerivClient:
             on_open=on_open,
             on_message=on_message,
             on_error=on_error,
+            header={"Origin": "https://smarttrader.deriv.com"}
         )
         thread = threading.Thread(target=ws.run_forever)
         thread.start()
@@ -59,7 +61,7 @@ class DerivClient:
         return result["data"]
 
     async def connect(self):
-        pass  # No persistent connection needed
+        pass
 
     async def disconnect(self):
         pass
@@ -85,10 +87,6 @@ class DerivClient:
         return data.get("candles", [])
 
     async def subscribe_candles(self, symbol: str, timeframe: str, on_candle) -> str:
-        """
-        Persistent subscription using websocket-client in a background thread.
-        on_candle is called with each new ohlc dict.
-        """
         sub_id_holder = {}
         started = threading.Event()
 
@@ -114,13 +112,14 @@ class DerivClient:
             }))
 
         def on_error(ws, error):
-            started.set()  # unblock even on error
+            started.set()
 
         ws = websocket.WebSocketApp(
             self.url,
             on_open=on_open,
             on_message=on_message,
             on_error=on_error,
+            header={"Origin": "https://smarttrader.deriv.com"}
         )
         thread = threading.Thread(target=ws.run_forever, daemon=True)
         thread.start()
