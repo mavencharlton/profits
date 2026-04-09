@@ -5,3 +5,5 @@ pandas
 pandas-ta
 numpy
 python-dotenv
+flask-cors
+pyngrok
